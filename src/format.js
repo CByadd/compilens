@@ -70,7 +70,24 @@ export function explainAsm(text) {
   return ''
 }
 
-const KEYWORDS =new Set(['INT', 'FLOAT', 'IF', 'ELSE', 'WHILE', 'PRINT', 'PRINTF'])
+const KEYWORDS = new Set(['INT', 'FLOAT', 'IF', 'ELSE', 'WHILE', 'PRINT', 'PRINTF'])
+
+const C_WORDS = new Set(['int', 'float', 'if', 'else', 'while', 'print', 'printf'])
+const C_PARTS = /(\/\/[^\n]*|\/\*[\s\S]*?(?:\*\/|$))|("(?:[^"\\\n]|\\.)*"?)|(\d+\.?\d*|\.\d+)|([A-Za-z_]\w*)/g
+
+// Split C source into [className | null, text] pieces for the editor's colour layer.
+export function highlightC(code) {
+  const out = []
+  let last = 0
+  for (const m of code.matchAll(C_PARTS)) {
+    if (m.index > last) out.push([null, code.slice(last, m.index)])
+    const cls = m[1] ? 'hl-comment' : m[2] || m[3] ? 'tok-lit' : C_WORDS.has(m[4]) ? 'tok-kw' : 'tok-id'
+    out.push([cls, m[0]])
+    last = m.index + m[0].length
+  }
+  if (last < code.length) out.push([null, code.slice(last)])
+  return out
+}
 
 export function tokenCategory(kind) {
   if (KEYWORDS.has(kind)) return 'kw'

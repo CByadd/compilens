@@ -1,16 +1,16 @@
 import {
-  ArrowRight, Check, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Code, LoaderCircle, Network, Pause, Pencil, Play, X,
+  ArrowRight, Check, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Code, LoaderCircle, Network, Pencil, Play, X,
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import Help from './Help.jsx'
 import ThemeToggle from './ThemeToggle.jsx'
 import Logo from './Logo.jsx'
 import ParserLab from './ParserLab.jsx'
+import { highlightC } from './format.js'
 import { PHASES, PhaseView } from './Phases.jsx'
 import { SAMPLES } from './samples.js'
 
 const ERROR_PHASE_INDEX = { lexical: 0, syntax: 1, semantic: 2, internal: 3 }
-const STEP_MS = 2500
 const LINE_HEIGHT = 21 // must match --line-h in styles.css
 const isNarrow = () => window.matchMedia('(max-width: 960px)').matches // same breakpoint as the one-column layout
 
@@ -32,7 +32,6 @@ export default function App() {
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const [active, setActive] = useState(0)
-  const [playing, setPlaying] = useState(false)
   const [selLine, setSelLine] = useState(null)
   const editorRef = useRef(null)
   const vizRef = useRef(null)
@@ -44,7 +43,6 @@ export default function App() {
 
   async function compile(code = source, reveal = false) {
     setLoading(true)
-    setPlaying(false)
     let r
     try {
       const res = await fetch('/api/compile', {
@@ -69,13 +67,6 @@ export default function App() {
   useEffect(() => { compile() }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!playing) return
-    if (active >= last) { setPlaying(false); return }
-    const id = setTimeout(() => setActive(a => a + 1), STEP_MS)
-    return () => clearTimeout(id)
-  }, [playing, active, last])
-
-  useEffect(() => {
     // keep the active step visible in the swipeable pipeline strip (horizontal only, never moves the page)
     const pipe = pipeRef.current, step = pipe?.children[active]
     if (step) pipe.scrollLeft = step.offsetLeft - (pipe.clientWidth - step.clientWidth) / 2
@@ -84,7 +75,6 @@ export default function App() {
   }, [active])
 
   function go(i) {
-    setPlaying(false)
     setActive(Math.max(0, Math.min(i, last)))
   }
 
@@ -203,12 +193,6 @@ export default function App() {
             </div>
             <div className="controls wide-only">
               <button onClick={() => go(active - 1)} disabled={!result || active === 0}><ChevronLeft size={16} aria-hidden /> Back</button>
-              <button
-                onClick={() => (playing ? setPlaying(false) : (setActive(active >= last ? 0 : active), setPlaying(true)))}
-                disabled={!result || last < 1}
-              >
-                {playing ? <><Pause size={15} aria-hidden /> Pause</> : <><Play size={15} aria-hidden /> Play all</>}
-              </button>
               <button className="primary" onClick={() => go(active + 1)} disabled={!result || active >= last}>Next <ChevronRight size={16} aria-hidden /></button>
             </div>
           </div>
@@ -345,6 +329,7 @@ function ErrorCard({ result, onSelectLine }) {
 
 function Editor({ value, onChange, selLine, errLine, onSelectLine, onRun }) {
   const [scroll, setScroll] = useState(0)
+  const [scrollLeft, setScrollLeft] = useState(0)
   const gutter = useRef(null)
   const lineCount = value.split('\n').length
   const caretLine = e => onSelectLine(e.target.value.slice(0, e.target.selectionStart).split('\n').length)
@@ -367,6 +352,13 @@ function Editor({ value, onChange, selLine, errLine, onSelectLine, onRun }) {
       <div className="code-area">
         {band(errLine, 'err')}
         {selLine !== errLine && band(selLine, 'sel')}
+        {/* coloured copy of the code under a transparent textarea, kept aligned on scroll */}
+        <pre className="code-colors" aria-hidden>
+          <code style={{ transform: `translate(${-scrollLeft}px, ${-scroll}px)` }}>
+            {highlightC(value).map(([cls, text], i) => (cls ? <span key={i} className={cls}>{text}</span> : text))}
+            {'\n'}
+          </code>
+        </pre>
         <textarea
           aria-label="C source code"
           value={value}
@@ -380,6 +372,7 @@ function Editor({ value, onChange, selLine, errLine, onSelectLine, onRun }) {
           onKeyDown={e => (e.ctrlKey || e.metaKey) && e.key === 'Enter' && onRun()}
           onScroll={e => {
             setScroll(e.target.scrollTop)
+            setScrollLeft(e.target.scrollLeft)
             gutter.current.scrollTop = e.target.scrollTop
           }}
         />

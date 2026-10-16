@@ -174,6 +174,19 @@ button.link { border: 0; padding: 0; background: none; color: var(--accent); tex
   padding: var(--pad); line-height: var(--line-h); background: transparent; color: var(--text);
   outline: none; white-space: pre; overflow: auto; tab-size: 4;
 }
+/* Syntax colours: a <pre> drawn under the textarea. Font, padding and line height must match it exactly. */
+.code-colors {
+  position: absolute; inset: 0; margin: 0; padding: var(--pad); overflow: hidden; pointer-events: none;
+  font-family: var(--mono); font-size: 13.5px; line-height: var(--line-h); white-space: pre; tab-size: 4;
+  font-variant-ligatures: none; color: var(--text); background: transparent;
+}
+.code-colors code { display: block; font: inherit; }
+.code-colors .tok-kw { color: var(--kw); } /* no bold: wider glyphs would push the caret out of line */
+.code-colors .tok-id { color: var(--id); }
+.code-colors .tok-lit { color: var(--lit); }
+.hl-comment { color: var(--muted); font-style: italic; }
+.code-area textarea { color: transparent; caret-color: var(--text); }
+.code-area textarea::selection { background: rgb(91 79 240 / .28); color: transparent; }
 .line-band { position: absolute; left: 0; right: 0; height: var(--line-h); margin-top: var(--pad); pointer-events: none; }
 .line-band.sel { background: var(--hl); }
 .line-band.err { background: var(--err-soft); border-left: 3px solid var(--err); }
@@ -420,7 +433,7 @@ dialog.help::backdrop { background: rgb(8 10 20 / .55); backdrop-filter: blur(3p
   .narrow-only { display: block; }
   .app { padding-bottom: 140px; } /* room for the fixed bottom bar */
   button, select { min-height: 42px; }
-  textarea, select, .parse-input { font-size: 16px !important; } /* below 16px iOS Safari zooms in on focus */
+  textarea, select, .parse-input, .code-colors { font-size: 16px !important; } /* below 16px iOS Safari zooms in on focus; the colour layer must match */
   .editor { height: 280px; }
   .mobile-bar {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;

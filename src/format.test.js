@@ -1,6 +1,20 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { explainAsm, explainQuad, formatQuad, tokenCategory } from './format.js'
+import { explainAsm, explainQuad, formatQuad, highlightC, tokenCategory } from './format.js'
+
+test('highlightC colours C by token category and keeps every character', () => {
+  const src = 'int a; // note\na = 2.5 * x1;\nprintf("hi\\n", a);'
+  const parts = highlightC(src)
+  assert.equal(parts.map(([, t]) => t).join(''), src)
+  const cls = Object.fromEntries(parts.filter(([c]) => c).map(([c, t]) => [t, c]))
+  assert.equal(cls.int, 'tok-kw')
+  assert.equal(cls.printf, 'tok-kw')
+  assert.equal(cls.a, 'tok-id')
+  assert.equal(cls.x1, 'tok-id')
+  assert.equal(cls['2.5'], 'tok-lit')
+  assert.equal(cls['"hi\\n"'], 'tok-lit')
+  assert.equal(cls['// note'], 'hl-comment')
+})
 
 test('explainQuad', () => {
   const q = (op, a1, a2, res) => explainQuad({ op, a1, a2, res })

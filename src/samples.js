@@ -1,9 +1,18 @@
+// Short beginner programs with plain names; each one shows something different in the phases.
 export const SAMPLES = [
   {
-    name: 'Walkthrough: max of two (report §8.1)',
+    name: 'Add two numbers',
+    code: `int a; int b; int sum;
+a = 5;
+b = 3;
+sum = a + b;
+print(sum);`,
+  },
+  {
+    name: 'Find the bigger number',
     code: `int a; int b; int max;
-a = 5 + 3 * 2;      // constant folding: 3 * 2 -> 6, 5 + 6 -> 11
-b = 10;
+a = 7;
+b = 4;
 if (a > b) {
     max = a;
 } else {
@@ -12,70 +21,59 @@ if (a > b) {
 print(max);`,
   },
   {
-    name: 'While loop: sum 0..4',
+    name: 'Even or odd',
+    code: `int n;
+n = 7;
+if (n % 2 == 0) {
+    printf("even\\n");
+} else {
+    printf("odd\\n");
+}`,
+  },
+  {
+    name: 'Count from 1 to 5',
+    code: `int i;
+i = 1;
+while (i <= 5) {
+    print(i);
+    i = i + 1;
+}`,
+  },
+  {
+    name: 'Sum of 1 to 10',
     code: `int i; int sum;
-i = 0;
+i = 1;
 sum = 0;
-while (i < 5) {
+while (i <= 10) {
     sum = sum + i;
     i = i + 1;
 }
-printf("sum = %d\\n", sum);`,
+print(sum);`,
   },
   {
-    name: 'Operator precedence',
-    code: `int a; int b;
-a = 4;
-b = a + 3 * 2 - (a - 1) / 3;
-print(b);`,
+    name: 'Area of a circle',
+    code: `float r; float area;
+r = 2.5;
+area = 3.14 * r * r;
+print(area);`,
   },
   {
-    name: 'Constant folding',
+    name: 'Math done early (4 + 6 * 2)',
     code: `int x;
 x = 4 + 6 * 2;
 print(x);`,
   },
   {
-    name: 'Dead code elimination',
-    code: `int a; int b;
+    name: 'Mistake: missing semicolon',
+    code: `int a;
+a = 5
+print(a);`,
+  },
+  {
+    name: 'Mistake: variable not declared',
+    code: `int a;
 a = 5;
-b = 10;     // b is never read, so the optimizer removes it
-print(a);`,
-  },
-  {
-    name: 'Floats and type widening',
-    code: `float r; float area; int whole;
-r = 2.5;
-area = 3.14 * r * r;
-whole = area;       // warning: float -> int truncates
-printf("area = %f, whole = %d\\n", area, whole);`,
-  },
-  {
-    name: 'Nested scopes and shadowing',
-    code: `int a;
-a = 1;
-{
-    int a;          // a new 'a' in an inner scope
-    a = 2;
-    print(a);
-}
-print(a);`,
-  },
-  {
-    name: 'Error: missing parenthesis',
-    code: `int a;
-a = (5 + 3;`,
-  },
-  {
-    name: 'Error: undeclared variable',
-    code: `int a;
-a = 1;
-x = a + 10;`,
-  },
-  {
-    name: 'Error: redeclaration',
-    code: `int a;
-int a;`,
+b = a + 1;`,
   },
 ]
 
