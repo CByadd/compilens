@@ -1,3 +1,4 @@
+import { CircleHelp, X } from 'lucide-react'
 import { useRef } from 'react'
 
 const COMPILER_WORDS = [
@@ -28,11 +29,11 @@ export default function Help() {
   const dialog = useRef(null)
   return (
     <>
-      <button className="icon-btn" onClick={() => dialog.current.showModal()} aria-label="Help and glossary" title="Help and glossary">?</button>
+      <button className="icon-btn" onClick={() => dialog.current.showModal()} aria-label="Help and glossary" title="Help and glossary"><CircleHelp size={19} aria-hidden /></button>
       <dialog ref={dialog} className="help" onClick={e => e.target === dialog.current && dialog.current.close()}>
         <div className="help-head">
           <h2>How Compilens works</h2>
-          <button className="icon-btn" onClick={() => dialog.current.close()} aria-label="Close">✕</button>
+          <button className="icon-btn" onClick={() => dialog.current.close()} aria-label="Close"><X size={18} aria-hidden /></button>
         </div>
         <ol className="help-steps">
           <li><strong>C Compiler:</strong> write a small C program (or load a sample) and press <b>Compile</b>. Step through the six phases with <b>Next</b>; tap any line of code to see what it became in each phase.</li>

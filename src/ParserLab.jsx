@@ -1,3 +1,4 @@
+import { Check, ChevronDown, ChevronLeft, ChevronRight, CircleCheck, CircleX, ListEnd, TriangleAlert, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { buildLL1, buildLR, LR_NAMES, parseGrammar, parseLL1, parseLR, showProd, tokenizeInput } from './grammar.js'
 import { GRAMMARS } from './samples.js'
@@ -83,7 +84,7 @@ export default function ParserLab() {
           rows={7}
         />
         {a.error && <p className="field-error" role="alert">{a.error}</p>}
-        {a.g?.warnings.map((w, i) => <p key={i} className="field-warn">⚠ {w}</p>)}
+        {a.g?.warnings.map((w, i) => <p key={i} className="field-warn"><TriangleAlert size={14} aria-hidden /> {w}</p>)}
 
         <label className="field-label" htmlFor="pinput">Input to parse</label>
         <input
@@ -123,7 +124,7 @@ export default function ParserLab() {
                       <span className="pick-name">{ALGOS[k].label}</span>
                       {!a.error && (
                         <span className={`pick-fit ${fits ? 'yes' : 'no'}`}>
-                          {fits ? '✓ fits' : '✕ conflicts'}
+                          {fits ? <><Check size={13} strokeWidth={3} aria-hidden /> fits</> : <><X size={13} strokeWidth={3} aria-hidden /> conflicts</>}
                         </span>
                       )}
                     </button>
@@ -151,7 +152,7 @@ export default function ParserLab() {
 function Section({ n, title, read, children }) {
   return (
     <details className="lab-section" open>
-      <summary><span className="sec-num">{n}</span>{title}</summary>
+      <summary><span className="sec-num">{n}</span>{title}<ChevronDown size={18} className="sec-chevron" aria-hidden /></summary>
       {read && <p className="howto"><span><strong>How to read this:</strong> {read}</span></p>}
       {children}
     </details>
@@ -170,9 +171,9 @@ function Verdict({ conflict, hints, a, run }) {
   }
   if (a.tokenError) return <div className="error-card"><strong>Fix the input</strong><p>{a.tokenError}</p></div>
   if (run.accepted) {
-    return <div className="ok-card"><strong>✓ Accepted.</strong> "{a.tokens.join(' ')}" is a sentence of this grammar.</div>
+    return <div className="ok-card"><strong><CircleCheck size={17} aria-hidden /> Accepted.</strong> "{a.tokens.join(' ')}" is a sentence of this grammar.</div>
   }
-  return <div className="error-card"><strong>✕ Rejected.</strong><p>{run.steps.at(-1).action}</p></div>
+  return <div className="error-card"><strong><CircleX size={17} aria-hidden /> Rejected.</strong><p>{run.steps.at(-1).action}</p></div>
 }
 
 function LL1View({ a }) {
@@ -359,10 +360,10 @@ function Trace({ run, step: outer, setStep: setOuter }) {
   return (
     <>
       <div className="trace-controls">
-        <button onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0}>◀ Back</button>
+        <button onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0}><ChevronLeft size={16} aria-hidden /> Back</button>
         <span className="muted">Step {step + 1} of {n}</span>
-        <button className="primary" onClick={() => setStep(Math.min(n - 1, step + 1))} disabled={step >= n - 1}>Next ▶</button>
-        <button onClick={() => setStep(n - 1)} disabled={step >= n - 1}>Show all</button>
+        <button className="primary" onClick={() => setStep(Math.min(n - 1, step + 1))} disabled={step >= n - 1}>Next <ChevronRight size={16} aria-hidden /></button>
+        <button onClick={() => setStep(n - 1)} disabled={step >= n - 1}><ListEnd size={16} aria-hidden /> Show all</button>
       </div>
       <div className="table-wrap">
         <table className="trace-table">

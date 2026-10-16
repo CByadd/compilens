@@ -1,3 +1,4 @@
+import { TriangleAlert } from 'lucide-react'
 import { explainAsm, explainQuad, formatQuad, tokenCategory } from './format.js'
 
 const countNodes = n => 1 + n.children.reduce((s, c) => s + countNodes(c), 0)
@@ -132,7 +133,7 @@ function Warnings({ warnings, ...p }) {
   if (!warnings?.length) return null
   return (
     <ul className="notes warn">
-      {warnings.map((w, i) => <li key={i} {...lineProps(w.line, p.selLine, p.onSelectLine)}>⚠ Line {w.line}: {w.msg}</li>)}
+      {warnings.map((w, i) => <li key={i} {...lineProps(w.line, p.selLine, p.onSelectLine)}><TriangleAlert size={14} aria-hidden /> Line {w.line}: {w.msg}</li>)}
     </ul>
   )
 }

@@ -111,7 +111,7 @@ export function parseLL1(g, ll, tokens) {
   const row = action => steps.push({ stack: stack.join(' '), input: input.slice(pos).join(' '), action })
   while (steps.length < MAX_STEPS) {
     const X = stack[stack.length - 1], a = input[pos]
-    if (X === '$' && a === '$') { row('Accept ✓'); return { steps, accepted: true } }
+    if (X === '$' && a === '$') { row('Accept'); return { steps, accepted: true } }
     if (X === '$') { row(`Error: extra input ${a} after a complete parse`); return { steps, accepted: false } }
     if (!g.nts.includes(X)) {
       if (X !== a) { row(`Error: expected ${X} but found ${a === '$' ? 'end of input' : a}`); return { steps, accepted: false } }
@@ -245,7 +245,7 @@ export function parseLR(lr, tokens) {
     const s = stack[stack.length - 1], a = input[pos]
     const [act] = lr.action[s][a] ?? []
     if (!act) { row(`Error: state ${s} has no action for ${a}`); return { steps, accepted: false } }
-    if (act === 'acc') { row('Accept ✓'); return { steps, accepted: true } }
+    if (act === 'acc') { row('Accept'); return { steps, accepted: true } }
     if (act[0] === 's') {
       row(`Shift ${a}, go to state ${act.slice(1)}`)
       stack.push(a, Number(act.slice(1))); pos++

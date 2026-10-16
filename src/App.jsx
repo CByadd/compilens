@@ -1,3 +1,6 @@
+import {
+  ArrowRight, Check, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Code, LoaderCircle, Network, Pause, Pencil, Play, X,
+} from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import Help from './Help.jsx'
 import ThemeToggle from './ThemeToggle.jsx'
@@ -100,10 +103,10 @@ export default function App() {
         </a>
         <nav className="tabs" aria-label="Mode">
           <button className={mode === 'compiler' ? 'on' : ''} aria-current={mode === 'compiler' ? 'page' : undefined} onClick={() => switchMode('compiler')}>
-            <CodeIcon /> C Compiler
+            <Code size={18} aria-hidden /> C Compiler
           </button>
           <button className={mode === 'parser' ? 'on' : ''} aria-current={mode === 'parser' ? 'page' : undefined} onClick={() => switchMode('parser')}>
-            <TreeIcon /> Parser Lab
+            <Network size={18} aria-hidden /> Parser Lab
           </button>
         </nav>
         <ThemeToggle />
@@ -113,8 +116,8 @@ export default function App() {
       {mode === 'parser' ? (
         <>
           <Intro id="parser">
-            <strong>Parser Lab:</strong> type a grammar and an input on the left. Each parser tab shows <span className="ok-text">✓</span> when the
-            grammar fits that parser and <span className="err-text">✕</span> when its table has conflicts. Open a tab to see how it was built and watch the parse.
+            <strong>Parser Lab:</strong> type a grammar and an input on the left. Each parser tab shows <Check size={15} className="ok-text" aria-label="a check" /> when the
+            grammar fits that parser and <X size={15} className="err-text" aria-label="a cross" /> when its table has conflicts. Open a tab to see how it was built and watch the parse.
           </Intro>
           <ParserLab />
         </>
@@ -149,7 +152,7 @@ export default function App() {
               {SAMPLES.map((s, i) => <option key={i} value={i}>{s.name}</option>)}
             </select>
             <button className="primary" onClick={() => compile(source, true)} disabled={loading}>
-              {loading ? 'Compiling…' : 'Compile ▶'}
+              {loading ? <><LoaderCircle size={16} className="spin" aria-hidden /> Compiling…</> : <>Compile <Play size={15} aria-hidden /></>}
             </button>
           </div>
           <Editor
@@ -180,7 +183,9 @@ export default function App() {
                     aria-current={i === active ? 'step' : undefined}
                     onClick={() => go(i)}
                   >
-                    <span className="step-num">{status === 'done' ? '✓' : status === 'error' ? '!' : i + 1}</span>
+                    <span className="step-num">
+                      {status === 'done' ? <Check size={17} strokeWidth={3} aria-label="done" /> : status === 'error' ? <X size={17} strokeWidth={3} aria-label="error" /> : i + 1}
+                    </span>
                     <span className="step-name">{p.name}</span>
                     <span className="step-meta">
                       {status === 'done' ? p.count(result) : status === 'error' ? 'problem found' : status === 'locked' ? 'skipped' : p.output}
@@ -197,14 +202,14 @@ export default function App() {
               <h2>{phase.title} <code className="file">{phase.file}</code></h2>
             </div>
             <div className="controls wide-only">
-              <button onClick={() => go(active - 1)} disabled={!result || active === 0}>◀ Back</button>
+              <button onClick={() => go(active - 1)} disabled={!result || active === 0}><ChevronLeft size={16} aria-hidden /> Back</button>
               <button
                 onClick={() => (playing ? setPlaying(false) : (setActive(active >= last ? 0 : active), setPlaying(true)))}
                 disabled={!result || last < 1}
               >
-                {playing ? '❚❚ Pause' : '▶ Play all'}
+                {playing ? <><Pause size={15} aria-hidden /> Pause</> : <><Play size={15} aria-hidden /> Play all</>}
               </button>
-              <button className="primary" onClick={() => go(active + 1)} disabled={!result || active >= last}>Next ▶</button>
+              <button className="primary" onClick={() => go(active + 1)} disabled={!result || active >= last}>Next <ChevronRight size={16} aria-hidden /></button>
             </div>
           </div>
           <p className="what">{phase.what}</p>
@@ -230,7 +235,7 @@ export default function App() {
 
           {result && active < last && (
             <button className="next-hint" onClick={() => go(active + 1)}>
-              Next: {PHASES[active + 1].name}, which turns this into {PHASES[active + 1].output.toLowerCase()} ▶
+              Next: {PHASES[active + 1].name}, which turns this into {PHASES[active + 1].output.toLowerCase()} <ArrowRight size={16} aria-hidden />
             </button>
           )}
         </section>
@@ -240,13 +245,13 @@ export default function App() {
         <nav className="mobile-bar narrow-only" aria-label="Phase navigation">
           {selLine && <TraceBar line={selLine} source={compiled} onSelectLine={setSelLine} />}
           <div className="mobile-nav">
-            <button onClick={() => editorRef.current.scrollIntoView({ behavior: 'smooth' })}>✎ Code</button>
-            <button onClick={() => go(active - 1)} disabled={active === 0} aria-label="Previous phase">◀</button>
+            <button onClick={() => editorRef.current.scrollIntoView({ behavior: 'smooth' })}><Pencil size={16} aria-hidden /> Code</button>
+            <button onClick={() => go(active - 1)} disabled={active === 0} aria-label="Previous phase"><ChevronLeft size={20} aria-hidden /></button>
             <button className="mobile-phase" onClick={() => vizRef.current.scrollIntoView({ behavior: 'smooth' })}>
               <small>Phase {active + 1} of 6</small>
               {phase.name}
             </button>
-            <button className="primary" onClick={() => go(active + 1)} disabled={active >= last} aria-label="Next phase">▶</button>
+            <button className="primary" onClick={() => go(active + 1)} disabled={active >= last} aria-label="Next phase"><ChevronRight size={20} aria-hidden /></button>
           </div>
         </nav>
       )}
@@ -260,30 +265,13 @@ function TraceBar({ line, source, onSelectLine }) {
   const lines = (source ?? '').split('\n')
   return (
     <span className="trace">
-      <button onClick={() => onSelectLine(line - 1)} disabled={line <= 1} aria-label="Trace previous line">▲</button>
-      <button onClick={() => onSelectLine(line + 1)} disabled={line >= lines.length} aria-label="Trace next line">▼</button>
+      <button onClick={() => onSelectLine(line - 1)} disabled={line <= 1} aria-label="Trace previous line"><ChevronUp size={16} aria-hidden /></button>
+      <button onClick={() => onSelectLine(line + 1)} disabled={line >= lines.length} aria-label="Trace next line"><ChevronDown size={16} aria-hidden /></button>
       <span className="trace-text">
         Line {line}: <code>{lines[line - 1]?.trim() || '(blank line)'}</code>
       </span>
-      <button onClick={() => onSelectLine(null)} aria-label="Stop tracing">✕</button>
+      <button onClick={() => onSelectLine(null)} aria-label="Stop tracing"><X size={16} aria-hidden /></button>
     </span>
-  )
-}
-
-function CodeIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M8 6l-6 6 6 6M16 6l6 6-6 6M14 4l-4 16" />
-    </svg>
-  )
-}
-
-function TreeIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <circle cx="12" cy="5" r="2.5" /><circle cx="5" cy="19" r="2.5" /><circle cx="19" cy="19" r="2.5" />
-      <path d="M12 7.5v4M12 11.5L6.5 17M12 11.5l5.5 5.5" />
-    </svg>
   )
 }
 
@@ -300,7 +288,7 @@ function Intro({ id, children }) {
         aria-label="Hide these tips"
         title="Hide these tips"
         onClick={() => { setOpen(false); try { localStorage.setItem(key, 'hidden') } catch { /* private mode */ } }}
-      >✕</button>
+      ><X size={18} aria-hidden /></button>
     </div>
   )
 }

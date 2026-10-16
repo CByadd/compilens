@@ -9,6 +9,7 @@
     "test": "node --test src/*.test.js"
   },
   "dependencies": {
+    "lucide-react": "^1.58.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },

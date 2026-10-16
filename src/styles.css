@@ -86,6 +86,11 @@ button, select {
   background: var(--panel); border: 1px solid var(--border-strong); border-radius: 10px;
   padding: 7px 14px; cursor: pointer; transition: background .15s, border-color .15s, box-shadow .15s;
 }
+button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.lucide { flex-shrink: 0; vertical-align: -0.15em; }
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
 button:hover:not(:disabled), select:hover { background: var(--panel-2); border-color: var(--accent); }
 button:disabled { opacity: .45; cursor: default; }
 button.primary {
@@ -229,7 +234,7 @@ button.link { border: 0; padding: 0; background: none; color: var(--accent); tex
 }
 .phase-body { min-height: 200px; }
 .next-hint {
-  display: block; width: 100%; margin-top: 18px; padding: 12px 16px; text-align: right;
+  display: flex; justify-content: flex-end; width: 100%; margin-top: 18px; padding: 12px 16px; text-align: right;
   border: 1px dashed var(--border-strong); border-radius: 12px; background: transparent; color: var(--accent); font-weight: 650;
 }
 .pill { border-radius: 999px; padding: 2px 10px; font-size: 13px; background: var(--hl); border-color: transparent; font-weight: 600; }
@@ -312,6 +317,7 @@ summary.ast-label { display: list-item; }
 .error-card, .ok-card { border-radius: 12px; padding: 12px 16px; margin-bottom: 14px; border: 1px solid; border-left-width: 4px; }
 .error-card { border-color: var(--err); background: var(--err-soft); }
 .error-card strong { color: var(--err); }
+.error-card strong .lucide, .ok-card strong .lucide { vertical-align: -0.2em; }
 .error-card p { margin: 4px 0; }
 .error-msg { font-size: 16px; }
 .ok-card { border-color: var(--ok); background: var(--ok-soft); }
@@ -335,7 +341,7 @@ p.ok-card { margin: 0 0 12px; font-size: 14px; }
 .grammar-input { resize: vertical; min-height: 150px; }
 .grammar-input:focus, .parse-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 .field-error { color: var(--err); font-size: 14px; margin: 6px 0 0; }
-.field-warn { color: var(--lit); font-size: 13px; margin: 6px 0 0; }
+.field-warn { color: var(--lit); font-size: 13px; margin: 6px 0 0; display: flex; gap: 6px; align-items: baseline; }
 .small { font-size: 13px; margin: 6px 0 0; }
 
 .picker { display: grid; grid-template-columns: auto 1fr; gap: 14px; margin-bottom: 16px; }
@@ -359,8 +365,8 @@ p.ok-card { margin: 0 0 12px; font-size: 14px; }
 .lab-section { border-top: 1px solid var(--border); padding: 14px 0 6px; }
 .lab-section > summary { cursor: pointer; font-weight: 700; font-size: 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; list-style: none; }
 .lab-section > summary::-webkit-details-marker { display: none; }
-.lab-section > summary::after { content: '▾'; color: var(--muted); margin-left: auto; transition: transform .15s; }
-.lab-section:not([open]) > summary::after { transform: rotate(-90deg); }
+.sec-chevron { color: var(--muted); margin-left: auto; transition: transform .15s; }
+.lab-section:not([open]) .sec-chevron { transform: rotate(-90deg); }
 .sec-num {
   display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
   background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; font-size: 12px;
