@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import Help from './Help.jsx'
+import ThemeToggle from './ThemeToggle.jsx'
 import Logo from './Logo.jsx'
 import ParserLab from './ParserLab.jsx'
 import { PHASES, PhaseView } from './Phases.jsx'
@@ -105,6 +106,7 @@ export default function App() {
             <TreeIcon /> Parser Lab
           </button>
         </nav>
+        <ThemeToggle />
         <Help />
       </header>
 

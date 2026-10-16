@@ -24,39 +24,39 @@
   --shadow-sm: 0 1px 2px rgb(20 24 40 / .05), 0 1px 3px rgb(20 24 40 / .06);
   --shadow: 0 10px 30px rgb(20 24 40 / .10);
   --radius: 16px;
-  --mono: ui-monospace, 'Cascadia Code', 'JetBrains Mono', Consolas, Menlo, monospace;
+  --sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, Consolas, Menlo, monospace;
   --line-h: 21px; /* keep in sync with LINE_HEIGHT in App.jsx */
   --pad: 12px;
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0b0e16;
-    --glow: rgb(139 128 255 / .12);
-    --panel: #131826;
-    --panel-2: #181e2e;
-    --text: #e8ebf3;
-    --muted: #9aa3b6;
-    --border: #252c3e;
-    --border-strong: #343d54;
-    --accent: #8b80ff;
-    --accent-2: #b67cff;
-    --accent-soft: #221f47;
-    --accent-ink: #b9b2ff;
-    --hl: #3b3318;
-    --err: #ff7b6b;
-    --err-soft: #3a1c1a;
-    --ok: #4ade80;
-    --ok-soft: #12301f;
-    --code-bg: #0f131d;
-    --kw: #c4a5ff;
-    --lit: #fbbf24;
-    --id: #5eead4;
-    --shadow-sm: 0 1px 2px rgb(0 0 0 / .4);
-    --shadow: 0 16px 40px rgb(0 0 0 / .5);
-    color-scheme: dark;
-  }
+/* Light is the default; the moon button in the app bar switches to this. */
+:root[data-theme="dark"] {
+  --bg: #0b0e16;
+  --glow: rgb(139 128 255 / .12);
+  --panel: #131826;
+  --panel-2: #181e2e;
+  --text: #e8ebf3;
+  --muted: #9aa3b6;
+  --border: #252c3e;
+  --border-strong: #343d54;
+  --accent: #8b80ff;
+  --accent-2: #b67cff;
+  --accent-soft: #221f47;
+  --accent-ink: #b9b2ff;
+  --hl: #3b3318;
+  --err: #ff7b6b;
+  --err-soft: #3a1c1a;
+  --ok: #4ade80;
+  --ok-soft: #12301f;
+  --code-bg: #0f131d;
+  --kw: #c4a5ff;
+  --lit: #fbbf24;
+  --id: #5eead4;
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / .4);
+  --shadow: 0 16px 40px rgb(0 0 0 / .5);
+  color-scheme: dark;
 }
 
 /* ---------- Base ---------- */
@@ -66,10 +66,11 @@ body {
   color: var(--text);
   background: radial-gradient(1100px 420px at 15% -8%, var(--glow), transparent 70%), var(--bg);
   background-attachment: fixed;
-  font: 15px/1.55 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font: 15px/1.55 var(--sans);
+  font-feature-settings: 'cv11', 'ss01'; /* Inter: single-storey a, open digits */
   -webkit-font-smoothing: antialiased;
 }
-code, textarea, .gutter { font-family: var(--mono); font-size: 13.5px; }
+code, textarea, .gutter { font-family: var(--mono); font-size: 13.5px; font-variant-ligatures: none; } /* keep -> and != as typed */
 h1, h2, h3 { margin: 0; line-height: 1.25; }
 h2 { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
 h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 18px 0 8px; }
@@ -443,7 +444,7 @@ dialog.help::backdrop { background: rgb(8 10 20 / .55); backdrop-filter: blur(3p
   .app { padding: 10px 12px 140px; }
   .panel { padding: 14px 12px; border-radius: 14px; }
   .appbar { gap: 10px; padding-bottom: 12px; }
-  .appbar > .icon-btn { margin-left: auto; }
+  .appbar > .theme-btn { margin-left: auto; }
   .tabs { order: 3; width: 100%; margin-left: 0; }
   .tabs button { flex: 1; padding: 8px 6px; }
   .intro-steps { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 10px; font-size: 13.5px; }
