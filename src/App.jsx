@@ -1,5 +1,5 @@
 import {
-  ArrowRight, Check, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Code, LoaderCircle, Network, Pencil, Play, X,
+  ArrowRight, Check, ChevronDown, Info, ChevronLeft, ChevronRight, ChevronUp, Code, LoaderCircle, Network, Pencil, Play, X,
 } from 'lucide-react'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import Help from './Help.jsx'
@@ -98,7 +98,7 @@ export default function App() {
     <div className="app">
       <header className="appbar">
         <a className="brand" href="./" onClick={e => { e.preventDefault(); switchMode('compiler') }}>
-          <Logo size={38} />
+          <Logo size={28} />
           <span className="brand-text">
             <span className="wordmark">Compi<span>lens</span></span>
             <span className="tagline">See inside a compiler</span>
@@ -221,7 +221,7 @@ export default function App() {
           </p>
           {result?.[phase.key] && (
             <p className="howto">
-              <strong>How to read this:</strong> {phase.read}{' '}
+              <Info size={15} className="muted" aria-hidden /><strong>How to read this:</strong> {phase.read}{' '}
               {selLine
                 ? <span className="wide-only"><TraceBar line={selLine} source={compiled} onSelectLine={setSelLine} /></span>
                 : <span className="muted">Tap a line of your code, or any row below, to highlight what it became.</span>}
