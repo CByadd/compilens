@@ -1,7 +1,7 @@
 import {
   ArrowRight, Check, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Code, LoaderCircle, Network, Pencil, Play, X,
 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import Help from './Help.jsx'
 import ThemeToggle from './ThemeToggle.jsx'
 import Logo from './Logo.jsx'
@@ -33,6 +33,8 @@ export default function App() {
   const [loading, setLoading] = useState(false)
   const [active, setActive] = useState(0)
   const [selLine, setSelLine] = useState(null)
+  const [runId, setRunId] = useState(0) // bumps on every compile so the flow animation replays
+  const [glide, setGlide] = useState(null) // position of the highlight behind the open phase
   const editorRef = useRef(null)
   const vizRef = useRef(null)
   const headRef = useRef(null)
@@ -56,6 +58,7 @@ export default function App() {
     }
     setResult(r)
     setCompiled(code)
+    setRunId(n => n + 1)
     // start at phase 1 so students walk forward themselves; jump straight to the problem on errors
     setActive(r.ok ? 0 : (ERROR_PHASE_INDEX[r.phase] ?? 0))
     setSelLine(r.ok ? null : r.error?.line ?? null)
@@ -73,6 +76,16 @@ export default function App() {
     // after scrolling down a long phase, start the next one at its top
     if (headRef.current?.getBoundingClientRect().top < 0) headRef.current.scrollIntoView({ behavior: 'smooth' })
   }, [active])
+
+  useLayoutEffect(() => {
+    const place = () => {
+      const li = pipeRef.current?.children[active]
+      if (li) setGlide({ x: li.offsetLeft, w: li.offsetWidth })
+    }
+    place()
+    window.addEventListener('resize', place)
+    return () => window.removeEventListener('resize', place)
+  }, [active, runId])
 
   function go(i) {
     setActive(Math.max(0, Math.min(i, last)))
@@ -162,19 +175,22 @@ export default function App() {
         </section>
 
         <section className="panel viz-panel" aria-label="Compiler phases" ref={vizRef}>
-          <ol className="pipeline" ref={pipeRef}>
+          <ol className="pipeline" ref={pipeRef} key={runId}>
             {PHASES.map((p, i) => {
               const status = !result ? 'idle' : i < errIdx || result.ok ? 'done' : i === errIdx ? 'error' : 'locked'
+              const Icon = p.icon
               return (
-                <li key={p.key}>
+                <li key={p.key} className={`flow-${status} ${i === active && result ? 'is-active' : ''}`} style={{ '--i': i }}>
                   <button
                     className={`step step-${status} ${i === active && result ? 'active' : ''}`}
                     disabled={!result || i > last}
                     aria-current={i === active ? 'step' : undefined}
                     onClick={() => go(i)}
                   >
-                    <span className="step-num">
-                      {status === 'done' ? <Check size={17} strokeWidth={3} aria-label="done" /> : status === 'error' ? <X size={17} strokeWidth={3} aria-label="error" /> : i + 1}
+                    <span className="step-node">
+                      <Icon size={20} aria-hidden />
+                      {status === 'done' && <span className="step-badge ok"><Check size={11} strokeWidth={3.5} aria-label="done" /></span>}
+                      {status === 'error' && <span className="step-badge bad"><X size={11} strokeWidth={3.5} aria-label="problem found" /></span>}
                     </span>
                     <span className="step-name">{p.name}</span>
                     <span className="step-meta">
@@ -184,6 +200,7 @@ export default function App() {
                 </li>
               )
             })}
+            {result && glide && <span className="step-glide" aria-hidden style={{ transform: `translateX(${glide.x}px)`, width: glide.w }} />}
           </ol>
 
           <div className="phase-head" ref={headRef}>

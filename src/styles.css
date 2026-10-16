@@ -201,33 +201,87 @@ button.link { border: 0; padding: 0; background: none; color: var(--accent); tex
 .lang-help li { margin: 4px 0; }
 .lang-help p { margin: 4px 0 0; }
 
-/* ---------- Phase stepper ---------- */
-.pipeline { list-style: none; margin: 0 0 4px; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; }
-.pipeline li { position: relative; }
-.pipeline li + li::before { /* connector from the previous circle to this one */
-  content: ''; position: absolute; top: 23px; left: calc(-50% + 18px); right: calc(50% + 18px);
-  height: 2px; background: var(--border-strong); border-radius: 2px;
+/* ---------- Phase flow ----------
+   Each compile replays a short animation: nodes pop in one by one and the links fill left to right,
+   like the program flowing through the compiler. --i is the phase index, --d its start delay. */
+.pipeline {
+  position: relative; list-style: none; margin: 0 0 4px; padding: 0;
+  display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px;
 }
-.pipeline li:has(.step-done) + li:has(.step-done)::before,
-.pipeline li:has(.step-done) + li:has(.step-error)::before { background: var(--ok); }
+.pipeline li { position: relative; z-index: 1; --d: calc(var(--i) * 120ms); }
+.pipeline li + li::before, .pipeline li + li::after { /* link from the previous node to this one */
+  content: ''; position: absolute; top: 32px; height: 3px; border-radius: 3px;
+  left: calc(-50% + 27px); right: calc(50% + 27px);
+}
+.pipeline li + li::before { background: var(--border); }
+.pipeline li.flow-locked::before { background: repeating-linear-gradient(90deg, var(--border-strong) 0 5px, transparent 5px 10px); }
+.pipeline li.flow-done + li.flow-done::after,
+.pipeline li.flow-done + li.flow-error::after {
+  background-color: var(--ok); background-size: 24px 100%;
+  transform: scaleX(0); transform-origin: left;
+  /* same animation list on every filled link, so opening another phase never restarts the fill */
+  animation: link-fill .4s ease-out forwards calc(var(--d) - 80ms), link-flow .7s linear infinite;
+}
+.pipeline li.flow-done + li.flow-error::after { background-color: var(--err); }
+/* the link into the open phase carries moving dashes: data flowing in */
+.pipeline li.flow-done + li.is-active::after {
+  background-color: transparent; background-image: repeating-linear-gradient(90deg, var(--accent) 0 7px, transparent 7px 12px);
+}
+@keyframes link-fill { to { transform: scaleX(1); } }
+@keyframes link-flow { to { background-position: 24px 0; } }
+
 .step {
-  position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; gap: 2px;
-  text-align: center; padding: 6px 4px 8px; border: 0; border-radius: 12px; background: transparent;
+  position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; gap: 1px;
+  text-align: center; padding: 9px 4px 10px; border: 0; border-radius: 14px; background: transparent;
 }
-.step:hover:not(:disabled) { background: var(--panel-2); }
-.step-num {
-  display: grid; place-items: center; width: 34px; height: 34px; margin-bottom: 4px; border-radius: 50%;
-  border: 2px solid var(--border-strong); background: var(--panel); color: var(--muted); font-size: 13px; font-weight: 700;
-  transition: box-shadow .2s;
+.step:hover:not(:disabled):not(.active) { background: var(--panel-2); }
+.step-node {
+  position: relative; display: grid; place-items: center; width: 46px; height: 46px; margin-bottom: 7px; border-radius: 50%;
+  border: 2px solid var(--border-strong); background: var(--panel); color: var(--muted);
+  transition: background .3s, color .3s, border-color .3s, box-shadow .3s;
+  animation: node-in .5s cubic-bezier(.34, 1.56, .64, 1) both; animation-delay: var(--d);
 }
-.step-name { font-weight: 650; font-size: 13.5px; }
+.flow-done .step-node { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+.flow-error .step-node {
+  background: var(--err-soft); border-color: var(--err); color: var(--err);
+  animation: node-in .5s cubic-bezier(.34, 1.56, .64, 1) both var(--d), shake .45s ease-in-out calc(var(--d) + 500ms);
+}
+.flow-locked .step-node { border-style: dashed; opacity: .55; }
+.is-active .step-node {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-color: transparent; color: #fff;
+  box-shadow: 0 6px 18px rgb(91 79 240 / .35);
+}
+.is-active.flow-error .step-node { background: var(--err); box-shadow: 0 6px 18px rgb(208 52 28 / .35); }
+.is-active .step-node::after { /* soft pulse around the open phase */
+  content: ''; position: absolute; inset: -7px; border-radius: 50%; border: 2px solid var(--accent);
+  animation: pulse 2.2s ease-out infinite; pointer-events: none;
+}
+.is-active.flow-error .step-node::after { border-color: var(--err); }
+.step-badge {
+  position: absolute; right: -4px; bottom: -4px; display: grid; place-items: center; width: 19px; height: 19px;
+  border-radius: 50%; color: #fff; border: 2px solid var(--panel);
+  animation: node-in .35s cubic-bezier(.34, 1.56, .64, 1) both; animation-delay: calc(var(--d) + 260ms);
+}
+.step-badge.ok { background: var(--ok); }
+.step-badge.bad { background: var(--err); }
+.step-name { font-weight: 650; font-size: 13.5px; transition: color .3s; }
 .step-meta { font-size: 11.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-.step-done .step-num { background: var(--ok); border-color: var(--ok); color: #fff; }
-.step-error .step-num { background: var(--err); border-color: var(--err); color: #fff; }
 .step-error .step-meta { color: var(--err); }
-.step.active { background: var(--accent-soft); }
-.step.active .step-num { box-shadow: 0 0 0 4px var(--panel), 0 0 0 6px var(--accent); }
 .step.active .step-name { color: var(--accent-ink); }
+.flow-locked .step-name, .flow-locked .step-meta { opacity: .6; }
+.step-glide { /* highlight that slides to the open phase */
+  position: absolute; z-index: 0; top: 0; bottom: 0; left: 0; border-radius: 14px;
+  background: var(--accent-soft); transition: transform .45s cubic-bezier(.22, 1, .36, 1), width .45s cubic-bezier(.22, 1, .36, 1);
+}
+@keyframes node-in { from { transform: scale(.4); opacity: 0; } }
+@keyframes shake { 20% { transform: translateX(-5px); } 40% { transform: translateX(5px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
+@keyframes pulse { from { transform: scale(.9); opacity: .8; } to { transform: scale(1.35); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .pipeline *, .pipeline *::before, .pipeline *::after, .pipeline li::before, .pipeline li::after {
+    animation: none !important; transition: none !important;
+  }
+  .pipeline li.flow-done + li::after { transform: none; }
+}
 
 /* ---------- Phase header ---------- */
 .phase-head { display: flex; gap: 12px; justify-content: space-between; align-items: flex-end; margin: 18px 0 6px; padding-top: 16px; border-top: 1px solid var(--border); }

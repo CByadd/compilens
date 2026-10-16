@@ -1,41 +1,41 @@
-import { TriangleAlert } from 'lucide-react'
+import { Cpu, ListOrdered, Network, ScanText, ShieldCheck, TriangleAlert, Zap } from 'lucide-react'
 import { explainAsm, explainQuad, formatQuad, tokenCategory } from './format.js'
 
 const countNodes = n => 1 + n.children.reduce((s, c) => s + countNodes(c), 0)
 
 export const PHASES = [
   {
-    key: 'tokens', name: 'Lexical', title: 'Lexical analysis', input: 'Source code', output: 'Tokens', file: 'lexer.py',
+    key: 'tokens', icon: ScanText, name: 'Lexical', title: 'Lexical analysis', input: 'Source code', output: 'Tokens', file: 'lexer.py',
     what: 'Reads your code character by character and groups the characters into tokens, the "words" of the program. Spaces and comments are thrown away.',
     read: 'Each chip is one token: the text from your code on top, its kind underneath.',
     count: r => `${r.tokens.length} tokens`,
   },
   {
-    key: 'ast', name: 'Syntax', title: 'Syntax analysis', input: 'Tokens', output: 'Syntax tree', file: 'parser.py',
+    key: 'ast', icon: Network, name: 'Syntax', title: 'Syntax analysis', input: 'Tokens', output: 'Syntax tree', file: 'parser.py',
     what: 'Checks that the tokens follow the grammar of C and builds a tree showing how the pieces fit together, like diagramming a sentence.',
     read: 'Read it top-down. Operations deeper in the tree happen first: in 5 + 3 * 2 the * sits below the +. Click a ▾ arrow to fold a branch.',
     count: r => `${countNodes(r.ast)} nodes`,
   },
   {
-    key: 'symbols', name: 'Semantic', title: 'Semantic analysis', input: 'Syntax tree', output: 'Symbol table + types', file: 'semantic.py',
+    key: 'symbols', icon: ShieldCheck, name: 'Semantic', title: 'Semantic analysis', input: 'Syntax tree', output: 'Symbol table + types', file: 'semantic.py',
     what: 'Checks that the program makes sense: every variable is declared before it is used and only once per block, and every value gets a type (int or float).',
     read: 'One row per declared variable. Scope tells which { } block owns it; an inner block may reuse a name.',
     count: r => `${r.symbols.length} variables`,
   },
   {
-    key: 'tac', name: 'Intermediate', title: 'Intermediate code generation', input: 'Checked syntax tree', output: 'Three-address code', file: 'icg.py',
+    key: 'tac', icon: ListOrdered, name: 'Intermediate', title: 'Intermediate code generation', input: 'Checked syntax tree', output: 'Three-address code', file: 'icg.py',
     what: 'Flattens the tree into a list of tiny steps that each do at most one operation. Temporaries t1, t2… hold partial results; labels and jumps replace if and while.',
     read: 'Each row is one quadruple: operator, two inputs, one result (on wide screens you also see them split into columns). The Meaning column says what it does.',
     count: r => `${r.tac.length} steps`,
   },
   {
-    key: 'opt_tac', name: 'Optimize', title: 'Code optimization', input: 'Three-address code', output: 'Optimized code', file: 'optimizer.py',
+    key: 'opt_tac', icon: Zap, name: 'Optimize', title: 'Code optimization', input: 'Three-address code', output: 'Optimized code', file: 'optimizer.py',
     what: 'Makes the code smaller without changing what it does: math on constants is done now (constant folding) and values nobody reads are dropped (dead-code elimination).',
     read: 'Left is before, right is after. Struck-out lines were removed, colored lines were rewritten. The list below explains every change.',
     count: r => `${r.tac.length} → ${r.opt_tac.length} steps`,
   },
   {
-    key: 'asm', name: 'Target', title: 'Target code generation', input: 'Optimized code', output: 'Assembly', file: 'codegen.py',
+    key: 'asm', icon: Cpu, name: 'Target', title: 'Target code generation', input: 'Optimized code', output: 'Assembly', file: 'codegen.py',
     what: 'Turns the steps into instructions for a simple CPU with 8 registers (R0–R7). Variables live in memory and are loaded into a register before the CPU can use them.',
     read: 'One instruction per row with its meaning on the right. #5 means the number 5; L1: marks a place a jump can go to.',
     count: r => `${r.asm.length} instructions`,
